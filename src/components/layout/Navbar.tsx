@@ -10,9 +10,9 @@ export default function Navbar() {
   const { todaysPlan, savedWorkouts } = useWorkout();
 
   return (
-    <div className="navbar bg-[#0a0a0a] border-b border-neutral-800 px-2 sm:px-4 md:px-8 h-20">
+    <div className="navbar sticky top-0 z-50 bg-[#0a0a0a] border-b border-neutral-800 px-2 sm:px-4 md:px-8 h-20">
       
-      <div className="navbar-start w-1/3 lg:w-1/4">
+      <div className="navbar-start  w-1/3 lg:w-1/4">
         {/* Mobile Hamburger Menu */}
         <div className="dropdown lg:hidden">
           <div tabIndex={0} role="button" className="btn btn-ghost text-white px-0 pl-2 sm:px-2 mr-2">

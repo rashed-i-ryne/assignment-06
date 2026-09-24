@@ -1,17 +1,11 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Oswald } from "next/font/google";
 import "./globals.css";
 import { WorkoutProvider } from "@/context/WorkoutContext";
-import Navbar from "@/components/layout/Navbar"; // Ensure this path is correct
-import Footer from "@/components/layout/Footer";
-import { Oswald } from 'next/font/google';
+import Navbar from "@/components/layout/Navbar";
 
-const inter = Inter({ subsets: ["latin"] });
-
-const oswald = Oswald({
-  subsets: ['latin'],
-  variable: '--font-oswald', // Define a custom CSS variable
-});
+// Initialize the Oswald font
+const oswald = Oswald({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "FitLog",
@@ -24,13 +18,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" data-theme= "light">
-      
-      <body className={inter.className}>
+    <html lang="en" data-theme="dark">
+      <body className={`${oswald.className} bg-neutral-950 text-neutral-50 min-h-screen flex flex-col`}>
         <WorkoutProvider>
           <Navbar />
-          {children}
-          <Footer />
+          <main className="flex-grow">
+            {children}
+          </main>
         </WorkoutProvider>
       </body>
     </html>

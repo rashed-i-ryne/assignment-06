@@ -6,11 +6,13 @@ const HeroSection = () => {
   return (
     <section className="py-12 px-4 sm:px-6 lg:px-8">
       <div className="container mx-auto">
+        
         {/* Dark Container Wrapper */}
         <div className="bg-[#121215] rounded-4xl p-8 md:p-12 lg:p-20 flex flex-col md:flex-row items-center justify-between gap-12 border border-zinc-800">
+          
           {/* Left Content */}
           <div className="space-y-8 md:w-1/2 flex flex-col items-center md:items-start text-center md:text-left">
-            <h1 className="text-4xl md:text-5xl lg:text-5xl font-black uppercase leading-[1.05] tracking-tight text-white">
+            <h1 className="font-medium text-4xl md:text-5xl lg:text-5xl font-black uppercase leading-[1.05] tracking-tight text-white">
               Train with intent. <br className="hidden lg:block" /> Log every
               set.
             </h1>
