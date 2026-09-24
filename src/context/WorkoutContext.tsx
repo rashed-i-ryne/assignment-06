@@ -3,17 +3,18 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 
 export interface Workout {
-  id: string;
+  id: number | string;
   name: string;
   image: string;
-  category: string[];
+  muscleGroups: string[]; // Add this
   equipment: string;
   difficulty: string;
-  sets: number;
-  reps: number;
   duration: number;
-  calories: number;
+  caloriesBurned: number;
+  sets: number;
+  reps: number | string;
   rating: number;
+  description?: string;   // Add this (optional with ?)
   instructions: string[];
 }
 
@@ -40,11 +41,24 @@ export function WorkoutProvider({ children }: { children: React.ReactNode }) {
       const localSaved = localStorage.getItem("fitlog_saved");
       
       if (localPlan) {
-        try { setTodaysPlan(JSON.parse(localPlan)); } catch (e) {}
-      }
-      if (localSaved) {
-        try { setSavedWorkouts(JSON.parse(localSaved)); } catch (e) {}
-      }
+  try { 
+    setTodaysPlan(JSON.parse(localPlan)); 
+  } catch (e) {
+    if (process.env.NODE_ENV === "development") {
+      console.error("Failed to parse localPlan from localStorage:", e);
+    }
+  }
+}
+
+if (localSaved) {
+  try { 
+    setSavedWorkouts(JSON.parse(localSaved)); 
+  } catch (e) {
+    if (process.env.NODE_ENV === "development") {
+      console.error("Failed to parse localSaved from localStorage:", e);
+    }
+  }
+}
       
       setIsLoaded(true);
     }, 0);

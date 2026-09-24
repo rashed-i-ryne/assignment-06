@@ -9,7 +9,15 @@ export async function getAllWorkouts(): Promise<Workout[]> {
 }
 
 export async function getWorkoutById(id: string): Promise<Workout> {
-  const res = await fetch(`${API_BASE}/${id}`);
-  if (!res.ok) throw new Error('Failed to fetch workout details');
-  return res.json();
+  const res = await fetch(API_BASE);
+  if (!res.ok) throw new Error('Failed to fetch workouts');
+  
+  const workouts: Workout[] = await res.json();
+  const workout = workouts.find((w) => String(w.id) === String(id));
+  
+  if (!workout) {
+    throw new Error('Workout not found');
+  }
+  
+  return workout;
 }

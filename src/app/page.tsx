@@ -1,4 +1,5 @@
 import HeroSection from "@/components/heroSection/HeroSection";
+import Footer from "@/components/layout/Footer";
 import Library from "@/components/library/Library";
 
 export default function Home() {
@@ -7,6 +8,7 @@ export default function Home() {
       <main className="min-h-screen w-full flex flex-col">
         <HeroSection />
         <Library />
+        <Footer />
       </main>
     </div>
   );
