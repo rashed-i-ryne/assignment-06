@@ -8,14 +8,17 @@ import WorkoutCard from './WorkoutCard';
 const Library = () => {
   const [workouts, setWorkouts] = useState<Workout[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [hasError, setHasError] = useState(false); // Added error state
 
   useEffect(() => {
     const fetchWorkouts = async () => {
       try {
         const data = await getAllWorkouts();
-        setWorkouts(data);
+        // Fallback safety check to guarantee we only set an array, preventing .map crashes
+        setWorkouts(Array.isArray(data) ? data : []);
       } catch (err) {
         console.error("Failed to load workouts:", err);
+        setHasError(true);
       } finally {
         setIsLoading(false); 
       }
@@ -46,9 +49,10 @@ const Library = () => {
       `}} />
 
       <div className="container mx-auto max-w-[1400px]">
-        {/* Header Section: text-center for mobile, md:text-left for desktop */}
+        {/* Header Section */}
         <div className="text-center md:text-left mb-10">
-          <h2 className="text-4xl md:text-5xl font-black uppercase tracking-tight mb-4 text-black">
+          {/* FIXED: Changed text-black to text-white for visibility on the dark background */}
+          <h2 className="text-4xl md:text-5xl font-black uppercase tracking-tight mb-4 text-white">
             THE LIBRARY
           </h2>
           <p className="text-zinc-400 text-base max-w-xl mx-auto md:mx-0">
@@ -69,6 +73,17 @@ const Library = () => {
                FETCHING WORKOUTS...
              </p>
           </div>
+        ) : hasError ? (
+           <div className="text-center py-20 min-h-[400px] flex flex-col items-center justify-center border border-dashed border-neutral-800 rounded-2xl">
+             <p className="text-red-500 font-bold uppercase mb-4">Could not load the library.</p>
+             <button onClick={() => window.location.reload()} className="btn bg-[#ccff00] text-black border-none rounded-full px-8 hover:bg-[#b3e600] font-bold">
+               Try Again
+             </button>
+           </div>
+        ) : workouts.length === 0 ? (
+           <div className="text-center py-20 text-neutral-500 uppercase font-bold">
+             No workouts found.
+           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
             {workouts.map(workout => (

@@ -11,6 +11,7 @@ export interface Workout {
   difficulty: string;
   duration: number;
   caloriesBurned: number;
+  calories:number,
   sets: number;
   reps: number | string;
   rating: number;

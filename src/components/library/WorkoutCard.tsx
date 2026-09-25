@@ -6,37 +6,31 @@ import Image from "next/image";
 const WorkoutCard = ({ workout }: { workout: Workout }) => {
   return (
     <Link
-      href={`/workout/${workout.id}`}
+      href={`/workouts/${workout.id}`}
       className="flex flex-col bg-[#18181b] rounded-2xl overflow-hidden border border-[#27272a] hover:border-zinc-600 hover:shadow-2xl transition-all duration-300 group h-full"
     >
-      {/* Top Image */}
-      <div className="relative h-52 w-full overflow-hidden">
-        <Image
-          src={workout.image}
-          alt={workout.name}
-          fill
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          className="object-cover group-hover:scale-105 transition-transform duration-500"
-        />
+      {/* Top Image with Bulletproof Fallback */}
+      <div className="relative h-52 w-full overflow-hidden bg-neutral-900">
+        {workout.image && String(workout.image).trim().length > 5 ? (
+          <Image
+            src={String(workout.image).trim()}
+            alt={workout.name || "Workout"}
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            className="object-cover group-hover:scale-105 transition-transform duration-500"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center border border-neutral-800">
+            <span className="text-neutral-600 text-xs font-bold uppercase tracking-widest">No Image</span>
+          </div>
+        )}
       </div>
 
       {/* Card Content */}
       <div className="p-5 flex flex-col grow">
-        
-        {/* Badges (Moved below the image) */}
-        <div className="flex flex-wrap gap-2 mb-3">
-          {workout.category?.map((group) => (
-            <span
-              key={group}
-              className="bg-[#ccff00] text-black text-[11px] px-3 py-1 rounded-full font-bold uppercase tracking-wider"
-            >
-              {group}
-            </span>
-          ))}
-        </div>
 
         {/* Title */}
-        <h2 className="text-xl font-black text-white uppercase tracking-tight mb-1 group-hover:text-zinc-300 transition-colors line-clamp-1">
+        <h2 className="text-xl font-black text-white uppercase tracking-tight mb-1 mt-2 group-hover:text-zinc-300 transition-colors line-clamp-1">
           {workout.name}
         </h2>
 
@@ -53,7 +47,8 @@ const WorkoutCard = ({ workout }: { workout: Workout }) => {
           </div>
           <div className="flex items-center gap-1.5">
             <Flame className="w-4 h-4 text-zinc-400" />
-            {workout.calories} kcal
+            {/* Note: Depending on your API, this might need to be workout.caloriesBurned */}
+            {workout.calories || workout.caloriesBurned} kcal
           </div>
           <div className="flex items-center gap-1.5">
             <Star className="w-4 h-4 text-zinc-400" />
