@@ -10,7 +10,8 @@ const WorkoutDetailsPage = async ({ params }: { params: Promise<{ id: string }> 
   let workout;
 
   try {
-    workout = await getWorkoutById(resolvedParams.id);
+    // Explicitly convert the ID parameter to a string to prevent strict type mismatch
+    workout = await getWorkoutById(String(resolvedParams.id));
   } catch {
     notFound();
   }

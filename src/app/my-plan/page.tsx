@@ -11,14 +11,20 @@ const MyPlanPage = () => {
 
   return (
     <div className="container mx-auto px-4 py-12 max-w-[1400px]">
-      <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tight mb-8 text-white">
-        My Plan & Saved Lifts
-      </h1>
+      {/* 1. Header Section */}
+      <div className="mb-8">
+        <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tight text-white mb-2">
+          MY PLAN
+        </h1>
+        <p className="text-neutral-400 text-base">
+          Cap of five lifts for today. Finish them, then load more.
+        </p>
+      </div>
       
-      {/* Metrics Summary Overview */}
+      {/* 2. Metrics Summary - Must pass the todaysPlan prop to calculate data */}
       <MetricsSummary todaysPlan={todaysPlan} />
 
-      {/* Tabs for Today's Plan vs Saved Workouts */}
+      {/* 3. Plan Tabs - Renders the actual list of saved/added workouts */}
       <div className="mt-8">
         <PlanTabs activeTab={activeTab} setActiveTab={setActiveTab} />
       </div>

@@ -1,81 +1,66 @@
 "use client";
 
 import { useState } from "react";
-import { Bookmark, BookmarkCheck, CalendarPlus, Check } from "lucide-react";
-import { Workout, useWorkout } from "@/context/WorkoutContext";
-import Toast from "@/components/ui/Toast";
+import { useWorkout, Workout } from "@/context/WorkoutContext";
+import { CalendarPlus, Bookmark } from "lucide-react";
 
-const ActionButtons = ({ workout }: { workout: Workout }) => {
-  const { todaysPlan, savedWorkouts, addToPlan, saveWorkout, unsaveWorkout } = useWorkout();
-  const [toast, setToast] = useState<{ isVisible: boolean; message: string; type: "success" | "error" }>({
-    isVisible: false,
-    message: "",
-    type: "success",
-  });
+// Assuming you pass the specific `workout` object into this component
+const WorkoutActionButtons = ({ workout }: { workout: Workout }) => {
+  const { todaysPlan, savedWorkouts, addToPlan, saveWorkout } = useWorkout();
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  const showToast = (message: string, type: "success" | "error" = "success") => {
-    setToast({ isVisible: true, message, type });
+  const handleAdd = () => {
+    const exists = todaysPlan.some((w) => w.id === workout.id);
+    if (exists) {
+      showToast("Already added to Today's Plan!");
+    } else {
+      addToPlan(workout);
+      showToast("Successfully added to plan!");
+    }
   };
 
-  const isAdded = todaysPlan.some((w) => w.id === workout.id);
-  const isSaved = savedWorkouts.some((w) => w.id === workout.id);
-  const isPlanFull = todaysPlan.length >= 5;
-
-  const handleAddToPlan = () => {
-    if (isAdded) return;
-    const result = addToPlan(workout);
-    showToast(result.message, result.success ? "success" : "error");
-  };
-
-  const handleSaveToggle = () => {
-    if (isSaved) {
-      unsaveWorkout(String(workout.id));
-      showToast("Removed from saved workouts.");
+  const handleSave = () => {
+    const exists = savedWorkouts.some((w) => w.id === workout.id);
+    if (exists) {
+      showToast("Workout is already saved!");
     } else {
       saveWorkout(workout);
-      showToast("Saved for later!");
+      showToast("Successfully saved for later!");
     }
+  };
+
+  const showToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 3000);
   };
 
   return (
     <>
-      <div className="flex items-center gap-3 mt-8">
-        <button
-          onClick={handleAddToPlan}
-          disabled={isAdded || (isPlanFull && !isAdded)}
-          className={`flex-3 flex items-center justify-center gap-2 py-4 rounded-xl font-semibold transition-all text-sm ${
-            isAdded 
-              ? "bg-[#ccff00] text-black cursor-default" 
-              : isPlanFull
-              ? "bg-[#27272a] text-zinc-500 cursor-not-allowed"
-              : "bg-[#ccff00] text-black hover:bg-[#b3e600]"
-          }`}
+      <div className="flex gap-4 mt-8">
+        <button 
+          onClick={handleAdd} 
+          className="btn flex-1 bg-[#ccff00] text-black border-none rounded-full hover:bg-[#b3e600] font-bold"
         >
-          {isAdded ? <Check className="w-4 h-4" /> : <CalendarPlus className="w-4 h-4" />}
-          {isAdded ? "ADDED TO PLAN" : "Add to today's plan"}
+          <CalendarPlus className="w-5 h-5" /> Add to today's plan
         </button>
-
-        <button
-          onClick={handleSaveToggle}
-          className={`flex-[1.2] flex items-center justify-center gap-2 py-4 px-4 rounded-xl font-semibold border transition-colors text-sm bg-[#18181b] ${
-            isSaved 
-              ? "border-[#ccff00] text-[#ccff00]" 
-              : "border-[#27272a] text-white hover:border-zinc-500"
-          }`}
+        <button 
+          onClick={handleSave} 
+          className="btn flex-1 btn-outline border-neutral-700 text-white rounded-full hover:bg-neutral-800"
         >
-          {isSaved ? <BookmarkCheck className="w-4 h-4 text-[#ccff00]" /> : <Bookmark className="w-4 h-4" />}
-          {isSaved ? "Saved" : "Save for later"}
+          <Bookmark className="w-5 h-5" /> Save for later
         </button>
       </div>
 
-      <Toast 
-        isVisible={toast.isVisible} 
-        message={toast.message} 
-        type={toast.type} 
-        onClose={() => setToast({ ...toast, isVisible: false })} 
-      />
+      {/* DaisyUI Toast */}
+      {toastMessage && (
+        <div className="toast toast-top toast-center z-50">
+          <div className="alert bg-[#121215] border border-neutral-800 text-white rounded-xl shadow-2xl">
+            <span>{toastMessage}</span>
+          </div>
+        </div>
+      )}
     </>
   );
 };
 
-export default ActionButtons;
+export default WorkoutActionButtons;

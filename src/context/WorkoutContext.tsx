@@ -6,7 +6,7 @@ export interface Workout {
   id: number | string;
   name: string;
   image: string;
-  muscleGroups: string[]; // Add this
+  muscleGroups: string[];
   equipment: string;
   difficulty: string;
   duration: number;
@@ -14,7 +14,7 @@ export interface Workout {
   sets: number;
   reps: number | string;
   rating: number;
-  description?: string;   // Add this (optional with ?)
+  description?: string;
   instructions: string[];
 }
 
@@ -22,14 +22,14 @@ interface WorkoutContextType {
   todaysPlan: Workout[];
   savedWorkouts: Workout[];
   addToPlan: (workout: Workout) => { success: boolean; message: string };
-  removeFromPlan: (id: string) => void;
+  removeFromPlan: (id: string | number) => void;
   saveWorkout: (workout: Workout) => void;
-  unsaveWorkout: (id: string) => void;
+  unsaveWorkout: (id: string | number) => void;
 }
 
 const WorkoutContext = createContext<WorkoutContextType | undefined>(undefined);
 
-export function WorkoutProvider({ children }: { children: React.ReactNode }) {
+export const WorkoutProvider = ({ children }: { children: React.ReactNode }) => {
   const [todaysPlan, setTodaysPlan] = useState<Workout[]>([]);
   const [savedWorkouts, setSavedWorkouts] = useState<Workout[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -41,24 +41,24 @@ export function WorkoutProvider({ children }: { children: React.ReactNode }) {
       const localSaved = localStorage.getItem("fitlog_saved");
       
       if (localPlan) {
-  try { 
-    setTodaysPlan(JSON.parse(localPlan)); 
-  } catch (e) {
-    if (process.env.NODE_ENV === "development") {
-      console.error("Failed to parse localPlan from localStorage:", e);
-    }
-  }
-}
+        try { 
+          setTodaysPlan(JSON.parse(localPlan)); 
+        } catch (e) {
+          if (process.env.NODE_ENV === "development") {
+            console.error("Failed to parse localPlan from localStorage:", e);
+          }
+        }
+      }
 
-if (localSaved) {
-  try { 
-    setSavedWorkouts(JSON.parse(localSaved)); 
-  } catch (e) {
-    if (process.env.NODE_ENV === "development") {
-      console.error("Failed to parse localSaved from localStorage:", e);
-    }
-  }
-}
+      if (localSaved) {
+        try { 
+          setSavedWorkouts(JSON.parse(localSaved)); 
+        } catch (e) {
+          if (process.env.NODE_ENV === "development") {
+            console.error("Failed to parse localSaved from localStorage:", e);
+          }
+        }
+      }
       
       setIsLoaded(true);
     }, 0);
@@ -78,25 +78,28 @@ if (localSaved) {
     if (todaysPlan.length >= 5) {
       return { success: false, message: "Your plan is full (Max 5 workouts)." };
     }
-    if (todaysPlan.some((w) => w.id === workout.id)) {
+    // Convert both IDs to strings for a safe comparison
+    if (todaysPlan.some((w) => String(w.id) === String(workout.id))) {
       return { success: false, message: "Workout is already in your plan." };
     }
     setTodaysPlan([...todaysPlan, workout]);
     return { success: true, message: "Added to today's plan!" };
   };
 
-  const removeFromPlan = (id: string) => {
-    setTodaysPlan(todaysPlan.filter((w) => w.id !== id));
+  const removeFromPlan = (id: string | number) => {
+    // Convert both IDs to strings to bypass number vs string strict inequality
+    setTodaysPlan(todaysPlan.filter((w) => String(w.id) !== String(id)));
   };
 
   const saveWorkout = (workout: Workout) => {
-    if (!savedWorkouts.some((w) => w.id === workout.id)) {
+    if (!savedWorkouts.some((w) => String(w.id) === String(workout.id))) {
       setSavedWorkouts([...savedWorkouts, workout]);
     }
   };
 
-  const unsaveWorkout = (id: string) => {
-    setSavedWorkouts(savedWorkouts.filter((w) => w.id !== id));
+  const unsaveWorkout = (id: string | number) => {
+    // Convert both IDs to strings
+    setSavedWorkouts(savedWorkouts.filter((w) => String(w.id) !== String(id)));
   };
 
   return (
@@ -113,12 +116,12 @@ if (localSaved) {
       {children}
     </WorkoutContext.Provider>
   );
-}
+};
 
-export function useWorkout() {
+export const useWorkout = () => {
   const context = useContext(WorkoutContext);
   if (context === undefined) {
     throw new Error("useWorkout must be used within a WorkoutProvider");
   }
   return context;
-}
+};
