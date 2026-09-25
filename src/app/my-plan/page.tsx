@@ -1,17 +1,28 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import { useWorkout } from "@/context/WorkoutContext";
 import PlanTabs from "@/components/my-plane/PlanTabs";
 import MetricsSummary from "@/components/my-plane/MetricsSummary";
 
-const MyPlanPage = () => {
-  const { todaysPlan } = useWorkout();
-  const [activeTab, setActiveTab] = useState<"plan" | "saved">("plan");
+const PlanContent = () => {
+  const { todaysPlan, savedWorkouts } = useWorkout();
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  
+  // Derive active tab directly from the URL query parameter
+  const tabParam = searchParams.get("tab");
+  const activeTab: "plan" | "saved" = tabParam === "saved" ? "saved" : "plan";
+
+  // Update the URL when switching tabs
+  const setActiveTab = (tab: "plan" | "saved") => {
+    router.push(`/my-plan?tab=${tab}`);
+  };
 
   return (
     <div className="container mx-auto px-4 py-12 max-w-[1400px]">
-      {/* 1. Header Section */}
+      {/* Header Section */}
       <div className="mb-8">
         <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tight text-white mb-2">
           MY PLAN
@@ -21,14 +32,32 @@ const MyPlanPage = () => {
         </p>
       </div>
       
-      {/* 2. Metrics Summary - Must pass the todaysPlan prop to calculate data */}
-      <MetricsSummary todaysPlan={todaysPlan} />
+      {/* Metrics Summary */}
+      <MetricsSummary 
+        todaysPlan={todaysPlan} 
+        savedWorkouts={savedWorkouts} 
+        activeTab={activeTab} 
+      />
 
-      {/* 3. Plan Tabs - Renders the actual list of saved/added workouts */}
+      {/* Plan Tabs */}
       <div className="mt-8">
         <PlanTabs activeTab={activeTab} setActiveTab={setActiveTab} />
       </div>
     </div>
+  );
+};
+
+const MyPlanPage = () => {
+  return (
+    <Suspense 
+      fallback={
+        <div className="min-h-screen flex items-center justify-center">
+          <span className="loading loading-spinner text-[#ccff00] loading-lg"></span>
+        </div>
+      }
+    >
+      <PlanContent />
+    </Suspense>
   );
 };
 
