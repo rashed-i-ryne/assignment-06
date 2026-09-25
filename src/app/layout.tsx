@@ -3,6 +3,7 @@ import { Oswald } from "next/font/google";
 import "./globals.css";
 import { WorkoutProvider } from "@/context/WorkoutContext";
 import Navbar from "@/components/layout/Navbar";
+import Footer from "@/components/layout/Footer";
 
 const oswald = Oswald({ subsets: ["latin"] });
 
@@ -24,6 +25,7 @@ const RootLayout = ({
           <main className="grow">
             {children}
           </main>
+          <Footer />
         </WorkoutProvider>
       </body>
     </html>
