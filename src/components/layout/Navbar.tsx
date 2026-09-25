@@ -65,7 +65,6 @@ export default function Navbar() {
           </ul>
         </div>
 
-
         <Link
           href="/"
           className="hidden lg:flex items-center bg-transparent hover:opacity-80 transition-opacity text-white text-3xl font-black gap-5 px-0"

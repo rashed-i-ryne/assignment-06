@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { getAllWorkouts } from "@/lib/api";
-import { Workout } from "@/context/WorkoutContext";
+import { Workout, useWorkout } from "@/context/WorkoutContext";
 import VisualPanel from "@/components/details/VisualPanel";
 import InfoPanel from "@/components/details/InfoPanel";
 import Instructions from "@/components/details/Instructions";
@@ -11,15 +11,35 @@ import ActionButtons from "@/components/details/ActionButtons";
 
 const WorkoutDetailsPage = () => {
   const params = useParams();
+  const { customWorkouts } = useWorkout();
   const [workout, setWorkout] = useState<Workout | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const searchId = params?.id ? String(params.id).trim() : "";
+    if (!searchId) return;
+
     const fetchWorkout = async () => {
       try {
+        let foundCustom = customWorkouts.find((w) => String(w.id).trim() === searchId);
+
+        if (!foundCustom && typeof window !== "undefined") {
+          const localCustom = localStorage.getItem("fitlog_custom");
+          if (localCustom) {
+            try {
+              const parsed = JSON.parse(localCustom);
+              foundCustom = parsed.find((w: Workout) => String(w.id).trim() === searchId);
+            } catch (e) {}
+          }
+        }
+
+        if (foundCustom) {
+          setWorkout(foundCustom);
+          setLoading(false);
+          return;
+        }
+
         const workouts = await getAllWorkouts();
-        // Force strict string comparison
-        const searchId = String(params?.id).trim();
         const found = workouts.find((w) => String(w.id).trim() === searchId);
 
         if (found) {
@@ -33,7 +53,7 @@ const WorkoutDetailsPage = () => {
     };
 
     fetchWorkout();
-  }, [params]);
+  }, [params?.id, customWorkouts]);
 
   if (loading) {
     return (

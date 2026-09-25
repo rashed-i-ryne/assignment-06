@@ -12,7 +12,7 @@ interface PlanTabsProps {
 }
 
 const PlanTabs = ({ activeTab, setActiveTab }: PlanTabsProps) => {
-  const { todaysPlan, savedWorkouts, removeFromPlan, unsaveWorkout } =
+  const { todaysPlan, savedWorkouts, removeFromPlan, unsaveWorkout, markAsDone } =
     useWorkout();
   const [sortBy, setSortBy] = useState("duration");
   const currentList = activeTab === "plan" ? todaysPlan : savedWorkouts;
@@ -29,7 +29,9 @@ const PlanTabs = ({ activeTab, setActiveTab }: PlanTabsProps) => {
 
   const handleMarkAsDone = (id: string | number) => {
     const targetWorkout = todaysPlan.find((w) => String(w.id) === String(id));
-    removeFromPlan(String(id), targetWorkout?.name);
+    if (targetWorkout) {
+      markAsDone(targetWorkout);
+    }
   };
 
   const handleRemove = (id: string | number) => {

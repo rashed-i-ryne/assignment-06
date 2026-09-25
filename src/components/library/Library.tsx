@@ -2,10 +2,16 @@
 
 import { useEffect, useState } from 'react';
 import { getAllWorkouts } from '@/lib/api';
-import { Workout } from '@/context/WorkoutContext';
+import { useWorkout, Workout } from '@/context/WorkoutContext';
 import WorkoutCard from './WorkoutCard';
 
-const Library = () => {
+interface LibraryProps {
+  limitApi?: number;
+    limitCustom?: number;
+}
+
+const Library = ({ limitApi, limitCustom }: LibraryProps) => {
+  const { customWorkouts } = useWorkout();
   const [workouts, setWorkouts] = useState<Workout[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
@@ -25,6 +31,10 @@ const Library = () => {
 
     fetchWorkouts();
   }, []);
+
+  const displayedApi = limitApi ? workouts.slice(0, limitApi) : workouts;
+  const displayedCustom = limitCustom ? customWorkouts.slice(0, limitCustom) : customWorkouts;
+  const allWorkouts = [...displayedCustom, ...displayedApi];
 
   return (
     <section id="library" className="py-24 px-4 scroll-mt-16">
@@ -47,14 +57,12 @@ const Library = () => {
       `}} />
 
       <div className="container mx-auto max-w-[1400px]">
-        
         <div className="text-center md:text-left mb-10">
-          
           <h2 className="text-4xl md:text-5xl font-black uppercase tracking-tight mb-4 text-white">
             THE LIBRARY
           </h2>
           <p className="text-zinc-400 text-base max-w-xl mx-auto md:mx-0">
-            Twelve lifts covering every major muscle group.
+            Explore all available lifts including your custom creations.
           </p>
         </div>
 
@@ -78,13 +86,13 @@ const Library = () => {
                Try Again
              </button>
            </div>
-        ) : workouts.length === 0 ? (
+        ) : allWorkouts.length === 0 ? (
            <div className="text-center py-20 text-neutral-500 uppercase font-bold">
              No workouts found.
            </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-            {workouts.map(workout => (
+            {allWorkouts.map(workout => (
               <WorkoutCard key={workout.id} workout={workout} />
             ))}
           </div>
