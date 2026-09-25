@@ -3,8 +3,27 @@
 import { useWorkout } from "@/context/WorkoutContext";
 import { Flame, Trophy, CheckCircle2, Trash2 } from "lucide-react";
 
+// 1. Type for individual workout items
+interface WorkoutHistoryItem {
+  id?: string | number;
+  name?: string;
+  completedAt?: string;
+  duration?: number | string;
+  calories?: number | string;
+}
+
+// 2. Type for the context state to replace 'any'
+interface WorkoutContextState {
+  history?: WorkoutHistoryItem[];
+  clearHistory?: () => void;
+}
+
 const WorkoutHistoryLog = () => {
-  const { history, clearHistory } = useWorkout();
+  // 3. Safely cast to our strict interface instead of 'any'
+  const context = useWorkout() as WorkoutContextState;
+  const history = context?.history || [];
+  const clearHistory = context?.clearHistory || (() => {});
+
   const streakCount = history.length > 0 ? Math.min(history.length, 7) : 0;
 
   const handleReset = () => {
@@ -14,10 +33,10 @@ const WorkoutHistoryLog = () => {
   };
 
   return (
-    <div className="mt-12 bg-[#121215] border border-neutral-800 rounded-3xl p-6 sm:p-8">
+    <div className="mt-12 bg-[#121215] border border-neutral-800 rounded-3xl p-6 sm:p-8 text-white">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <div>
-          <h3 className="text-2xl font-black text-white uppercase tracking-tight flex items-center gap-2">
+          <h3 className="text-2xl font-black uppercase tracking-tight flex items-center gap-2">
             <Trophy className="w-6 h-6 text-[#ccff00]" /> Workout History & Streak
           </h3>
           <p className="text-neutral-400 text-sm">Track your completed training sessions over time.</p>
@@ -26,7 +45,7 @@ const WorkoutHistoryLog = () => {
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-3 bg-neutral-900 border border-neutral-800 px-5 py-2.5 rounded-full">
             <Flame className="w-5 h-5 text-[#ccff00] animate-pulse" />
-            <span className="text-white font-bold text-sm uppercase tracking-wider">
+            <span className="font-bold text-sm uppercase tracking-wider text-white">
               {streakCount} Session Streak
             </span>
           </div>
@@ -48,23 +67,23 @@ const WorkoutHistoryLog = () => {
           No completed workouts recorded yet. Finish a workout from Today&apos;s Plan to log it here!
         </div>
       ) : (
-        <div className="flex flex-col gap-3 max-h-[300px] overflow-y-auto pr-2">
-          {history.map((item, index) => (
+        <div className="flex flex-col gap-3 max-h-80 overflow-y-auto pr-2">
+          {history.map((item: WorkoutHistoryItem, index: number) => (
             <div
-              key={`${item.id}-${index}`}
+              key={`${item.id || index}`}
               className="flex items-center justify-between bg-neutral-900/80 border border-neutral-800/80 p-4 rounded-2xl"
             >
               <div className="flex items-center gap-3">
                 <CheckCircle2 className="w-5 h-5 text-[#ccff00] shrink-0" />
                 <div>
-                  <h4 className="text-white font-bold uppercase text-sm">{item.name}</h4>
-                  <p className="text-neutral-400 text-xs">{item.completedAt}</p>
+                  <h4 className="font-bold uppercase text-sm text-white">{item.name || "Workout Session"}</h4>
+                  <p className="text-neutral-400 text-xs">{item.completedAt || "Recent"}</p>
                 </div>
               </div>
 
               <div className="flex gap-4 text-xs font-medium text-neutral-300">
-                <span>⏱️ {item.duration} min</span>
-                <span className="text-[#ccff00]">🔥 {item.calories} kcal</span>
+                <span>⏱️ {item.duration || 30} min</span>
+                <span className="text-[#ccff00]">🔥 {item.calories || 200} kcal</span>
               </div>
             </div>
           ))}

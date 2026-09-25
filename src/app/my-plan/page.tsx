@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { useWorkout } from "@/context/WorkoutContext";
 import MetricsSummary from "@/components/my-plan/MetricsSummary";
 import PlanTabs from "@/components/my-plan/PlanTabs";
+import WorkoutHistoryLog from "@/components/my-plan/WorkoutHistoryLog";
 
 const MyPlanContent = () => {
   const { todaysPlan, savedWorkouts } = useWorkout();
@@ -19,19 +20,23 @@ const MyPlanContent = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-12 max-w-[1400px] min-h-screen">
-      <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tight mb-8 text-white">
-        My Plan & Saved Lifts
-      </h1>
-      
-      <MetricsSummary 
-        todaysPlan={todaysPlan} 
-        savedWorkouts={savedWorkouts} 
-        activeTab={activeTab} 
-      />
-
-      <div className="mt-8">
+    <div className="container mx-auto px-4 py-12 max-w-[1400px] min-h-screen space-y-12">
+      <div>
+        <h1 className="text-4xl md:text-5xl font-semibold uppercase tracking-tight mb-8 text-white">
+          {activeTab === "plan" ? "My Plan" : "Saved Workouts"}
+        </h1>
+        
+        <MetricsSummary 
+          todaysPlan={todaysPlan} 
+          savedWorkouts={savedWorkouts} 
+          activeTab={activeTab} 
+        />
+      </div>
+      <div>
         <PlanTabs activeTab={activeTab} setActiveTab={handleTabChange} />
+      </div>
+      <div className="pt-8 border-t border-neutral-800 pb-12">
+        <WorkoutHistoryLog />
       </div>
     </div>
   );
