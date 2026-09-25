@@ -11,7 +11,7 @@ const EmptyState = () => {
         Nothing Here Yet
       </h3>
       <p className="text-zinc-400 max-w-sm mb-6 text-sm">
-        You haven't added any workouts to this list. Browse the library to find your next challenge.
+        You haven&apos;t added any workouts to this list. Browse the library to find your next challenge.
       </p>
       <Link 
         href="/#library" 

@@ -3,7 +3,6 @@ import { Workout } from "@/context/WorkoutContext";
 const InfoPanel = ({ workout }: { workout: Workout }) => {
   return (
     <div className="space-y-6">
-      {/* Title & Description at the very top */}
       <div>
         <h1 className="text-4xl md:text-5xl font-semibold uppercase tracking-tight text-white mb-2">
           {workout.name}
@@ -13,7 +12,6 @@ const InfoPanel = ({ workout }: { workout: Workout }) => {
         </p>
       </div>
 
-      {/* Muscle Group Badges */}
       <div className="flex flex-wrap gap-2">
         {workout.muscleGroups?.map((group) => (
           <span
@@ -25,7 +23,6 @@ const InfoPanel = ({ workout }: { workout: Workout }) => {
         ))}
       </div>
 
-      {/* Stats Table Card */}
       <div className="bg-[#18181b] border border-[#27272a] rounded-2xl overflow-hidden divide-y divide-[#27272a]">
         {[
           { label: "EQUIPMENT", value: workout.equipment },

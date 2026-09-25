@@ -43,7 +43,6 @@ const WorkoutDetailsPage = () => {
     );
   }
 
-  // This is the NEW error screen. If you see the yellow button again, the file wasn't saved!
   if (!workout) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center text-center">

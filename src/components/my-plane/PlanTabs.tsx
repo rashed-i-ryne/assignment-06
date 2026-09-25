@@ -12,58 +12,54 @@ interface PlanTabsProps {
 }
 
 const PlanTabs = ({ activeTab, setActiveTab }: PlanTabsProps) => {
-  const { todaysPlan, savedWorkouts, removeFromPlan, unsaveWorkout } = useWorkout();
-  
-  // State for Sorting and Toast Notifications
+  const { todaysPlan, savedWorkouts, removeFromPlan, unsaveWorkout } =
+    useWorkout();
   const [sortBy, setSortBy] = useState("duration");
-  const [toastMsg, setToastMsg] = useState<string | null>(null);
-
   const currentList = activeTab === "plan" ? todaysPlan : savedWorkouts;
-
-  // 1. Sort Logic
   const sortedList = [...currentList].sort((a, b) => {
     if (sortBy === "calories") {
-      return (Number(b.caloriesBurned) || 0) - (Number(a.caloriesBurned) || 0); // Highest calories first
+      return (Number(b.caloriesBurned) || 0) - (Number(a.caloriesBurned) || 0);
     }
-    return (Number(b.duration) || 0) - (Number(a.duration) || 0); // Highest duration first
+    return (Number(b.duration) || 0) - (Number(a.duration) || 0);
   });
 
-  // 2. Mark as Done Logic
+
   const handleMarkAsDone = (id: string | number) => {
-    removeFromPlan(String(id));
-    setToastMsg("Workout marked as complete!");
-    setTimeout(() => setToastMsg(null), 3000);
+    const targetWorkout = todaysPlan.find((w) => String(w.id) === String(id));
+    removeFromPlan(String(id), targetWorkout?.name);
   };
 
-  // 3. Remove Logic
   const handleRemove = (id: string | number) => {
     if (activeTab === "plan") {
-      removeFromPlan(String(id));
+      const targetWorkout = todaysPlan.find((w) => String(w.id) === String(id));
+      removeFromPlan(String(id), targetWorkout?.name);
     } else {
-      unsaveWorkout(String(id));
+      const targetWorkout = savedWorkouts.find(
+        (w) => String(w.id) === String(id),
+      );
+      unsaveWorkout(String(id), targetWorkout?.name);
     }
   };
 
   return (
     <div className="w-full relative">
-      {/* Tab Controls & Sort */}
       <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
         <div className="bg-[#121215] p-1 rounded-full border border-neutral-800 inline-flex">
           <button
             onClick={() => setActiveTab("plan")}
             className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${
               activeTab === "plan"
-                ? "bg-neutral-800 text-white"
+                ? "bg-[#ccff00] text-black font-bold"
                 : "text-neutral-400 hover:text-white"
             }`}
           >
-            Today's Plan
+            Today&apos;s Plan
           </button>
           <button
             onClick={() => setActiveTab("saved")}
             className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${
               activeTab === "saved"
-                ? "bg-neutral-800 text-white"
+                ? "bg-[#ccff00] text-black font-bold"
                 : "text-neutral-400 hover:text-white"
             }`}
           >
@@ -84,7 +80,6 @@ const PlanTabs = ({ activeTab, setActiveTab }: PlanTabsProps) => {
         </div>
       </div>
 
-      {/* List / Empty State Rendering */}
       {sortedList.length === 0 ? (
         <div className="border border-dashed border-neutral-800 rounded-2xl p-16 sm:p-24 flex flex-col items-center justify-center text-center">
           <h3 className="text-2xl font-black text-white uppercase mb-2 tracking-tight">
@@ -93,7 +88,6 @@ const PlanTabs = ({ activeTab, setActiveTab }: PlanTabsProps) => {
           <p className="text-neutral-400 mb-8">
             Browse the library and add a lift to get today moving.
           </p>
-          {/* Next.js Link for empty state */}
           <Link
             href="/"
             className="btn bg-[#ccff00] text-black border-none rounded-full px-8 hover:bg-[#b3e600] uppercase font-bold"
@@ -108,7 +102,6 @@ const PlanTabs = ({ activeTab, setActiveTab }: PlanTabsProps) => {
               key={workout.id}
               className="card flex-col sm:flex-row bg-[#121215] border border-neutral-800 rounded-2xl p-4 items-center gap-6"
             >
-              {/* Bulletproof Next.js Image Fallback */}
               <figure className="relative w-full sm:w-40 h-28 sm:h-20 rounded-xl overflow-hidden shrink-0 bg-neutral-900">
                 {workout.image && String(workout.image).trim().length > 5 ? (
                   <Image
@@ -120,7 +113,9 @@ const PlanTabs = ({ activeTab, setActiveTab }: PlanTabsProps) => {
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center bg-neutral-900 border border-neutral-800">
-                    <span className="text-neutral-600 text-xs font-bold uppercase tracking-widest">No Image</span>
+                    <span className="text-neutral-600 text-xs font-bold uppercase tracking-widest">
+                      No Image
+                    </span>
                   </div>
                 )}
               </figure>
@@ -146,10 +141,7 @@ const PlanTabs = ({ activeTab, setActiveTab }: PlanTabsProps) => {
                 </div>
               </div>
 
-              {/* Action Buttons */}
               <div className="flex items-center gap-3 w-full sm:w-auto mt-4 sm:mt-0 justify-end">
-                
-                {/* View Details using Next.js Link */}
                 <Link
                   href={`/workouts/${workout.id}`}
                   className="btn btn-outline btn-sm border-neutral-700 text-white rounded-full hover:bg-neutral-800 hover:border-neutral-600 font-normal"
@@ -175,16 +167,6 @@ const PlanTabs = ({ activeTab, setActiveTab }: PlanTabsProps) => {
               </div>
             </div>
           ))}
-        </div>
-      )}
-
-      {/* DaisyUI Toast for 'Mark as Done' */}
-      {toastMsg && (
-        <div className="toast toast-top toast-center z-50">
-          <div className="alert bg-[#121215] border border-neutral-800 text-white rounded-xl shadow-2xl">
-            <Check className="w-5 h-5 text-[#ccff00]" />
-            <span>{toastMsg}</span>
-          </div>
         </div>
       )}
     </div>

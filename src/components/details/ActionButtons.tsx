@@ -1,65 +1,72 @@
 "use client";
 
-import { useState } from "react";
 import { useWorkout, Workout } from "@/context/WorkoutContext";
-import { CalendarPlus, Bookmark } from "lucide-react";
+import { CalendarPlus, CalendarCheck, Bookmark, BookmarkCheck } from "lucide-react";
 
-// Assuming you pass the specific `workout` object into this component
-const WorkoutActionButtons = ({ workout }: { workout: Workout }) => {
-  const { todaysPlan, savedWorkouts, addToPlan, saveWorkout } = useWorkout();
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
+interface WorkoutActionButtonsProps {
+  workout: Workout;
+}
 
-  const handleAdd = () => {
-    const exists = todaysPlan.some((w) => w.id === workout.id);
-    if (exists) {
-      showToast("Already added to Today's Plan!");
+const WorkoutActionButtons = ({ workout }: WorkoutActionButtonsProps) => {
+  const { todaysPlan, savedWorkouts, addToPlan, removeFromPlan, saveWorkout, unsaveWorkout } = useWorkout();
+  const isInPlan = todaysPlan.some((w) => String(w.id) === String(workout.id));
+  const isSaved = savedWorkouts.some((w) => String(w.id) === String(workout.id));
+
+  const handlePlanToggle = () => {
+    if (isInPlan) {
+      removeFromPlan(workout.id, workout.name);
     } else {
       addToPlan(workout);
-      showToast("Successfully added to plan!");
     }
   };
 
-  const handleSave = () => {
-    const exists = savedWorkouts.some((w) => w.id === workout.id);
-    if (exists) {
-      showToast("Workout is already saved!");
+  const handleSaveToggle = () => {
+    if (isSaved) {
+      unsaveWorkout(workout.id, workout.name);
     } else {
       saveWorkout(workout);
-      showToast("Successfully saved for later!");
     }
-  };
-
-  const showToast = (msg: string) => {
-    setToastMessage(msg);
-    setTimeout(() => setToastMessage(null), 3000);
   };
 
   return (
-    <>
-      <div className="flex gap-4 mt-8">
-        <button 
-          onClick={handleAdd} 
-          className="btn flex-1 bg-[#ccff00] text-black border-none rounded-full hover:bg-[#b3e600] font-bold"
-        >
-          <CalendarPlus className="w-5 h-5" /> Add to today's plan
-        </button>
-        <button 
-          onClick={handleSave} 
-          className="btn flex-1 btn-outline border-neutral-700 text-white rounded-full hover:bg-neutral-800"
-        >
-          <Bookmark className="w-5 h-5" /> Save for later
-        </button>
-      </div>
-
-      {/* DaisyUI Toast */}
-      {toastMessage && (
-        <div className="toast toast-top toast-center z-50">
-          <div className="alert bg-[#121215] border border-neutral-800 text-white rounded-xl shadow-2xl">
-            <span>{toastMessage}</span>
-          </div>
-        </div>
-      )}
-    </>
+    <div className="flex flex-col sm:flex-row gap-4 mt-8 w-full">
+      <button 
+        onClick={handlePlanToggle} 
+        className={`btn flex-1 rounded-full border-none font-bold uppercase transition-colors ${
+          isInPlan 
+            ? "bg-neutral-800 text-[#ccff00] hover:bg-neutral-700" 
+            : "bg-[#ccff00] text-black hover:bg-[#b3e600]"
+        }`}
+      >
+        {isInPlan ? (
+          <>
+            <CalendarCheck className="w-5 h-5" /> Added to Plan
+          </>
+        ) : (
+          <>
+            <CalendarPlus className="w-5 h-5" /> Add to today&apos;s plan 
+          </>
+        )}
+      </button>
+      <button 
+        onClick={handleSaveToggle} 
+        className={`btn flex-1 rounded-full font-bold uppercase transition-colors ${
+          isSaved 
+            ? "bg-neutral-800 text-[#ccff00] border-neutral-700" 
+            : "btn-outline border-neutral-700 text-white hover:bg-neutral-800 hover:border-neutral-600"
+        }`}
+      >
+        {isSaved ? (
+          <>
+            <BookmarkCheck className="w-5 h-5 text-[#ccff00]" /> Saved
+          </>
+        ) : (
+          <>
+            <Bookmark className="w-5 h-5" /> Save for later
+          </>
+        )}
+      </button>
+    </div>
   );
 };
 

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from "react";
+import Toast from "@/components/ui/Toast";
 
 export interface Workout {
   id: number | string;
@@ -11,7 +12,7 @@ export interface Workout {
   difficulty: string;
   duration: number;
   caloriesBurned: number;
-  calories:number,
+  calories: number;
   sets: number;
   reps: number | string;
   rating: number;
@@ -23,9 +24,10 @@ interface WorkoutContextType {
   todaysPlan: Workout[];
   savedWorkouts: Workout[];
   addToPlan: (workout: Workout) => { success: boolean; message: string };
-  removeFromPlan: (id: string | number) => void;
+  removeFromPlan: (id: string | number, workoutName?: string) => void;
   saveWorkout: (workout: Workout) => void;
-  unsaveWorkout: (id: string | number) => void;
+  unsaveWorkout: (id: string | number, workoutName?: string) => void;
+  showToast: (message: string, workoutName: string, type?: "success" | "error") => void;
 }
 
 const WorkoutContext = createContext<WorkoutContextType | undefined>(undefined);
@@ -35,7 +37,31 @@ export const WorkoutProvider = ({ children }: { children: React.ReactNode }) => 
   const [savedWorkouts, setSavedWorkouts] = useState<Workout[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // Load from localStorage asynchronously to avoid React's synchronous cascading render warning
+  const [toastInfo, setToastInfo] = useState<{
+    isVisible: boolean;
+    message: string;
+    workoutName: string;
+    type: "success" | "error";
+  }>({
+    isVisible: false,
+    message: "",
+    workoutName: "",
+    type: "success",
+  });
+
+  const showToast = (message: string, workoutName: string, type: "success" | "error" = "success") => {
+    setToastInfo({
+      isVisible: true,
+      message,
+      workoutName,
+      type,
+    });
+  };
+
+  const hideToast = () => {
+    setToastInfo((prev) => ({ ...prev, isVisible: false }));
+  };
+
   useEffect(() => {
     const timer = setTimeout(() => {
       const localPlan = localStorage.getItem("fitlog_plan");
@@ -67,7 +93,6 @@ export const WorkoutProvider = ({ children }: { children: React.ReactNode }) => 
     return () => clearTimeout(timer);
   }, []);
 
-  // Save to localStorage when state changes
   useEffect(() => {
     if (isLoaded) {
       localStorage.setItem("fitlog_plan", JSON.stringify(todaysPlan));
@@ -77,30 +102,41 @@ export const WorkoutProvider = ({ children }: { children: React.ReactNode }) => 
 
   const addToPlan = (workout: Workout) => {
     if (todaysPlan.length >= 5) {
+      showToast("Your plan is full (Max 5 workouts).", "", "error");
       return { success: false, message: "Your plan is full (Max 5 workouts)." };
     }
-    // Convert both IDs to strings for a safe comparison
     if (todaysPlan.some((w) => String(w.id) === String(workout.id))) {
+      showToast("Already in your plan:", workout.name, "error");
       return { success: false, message: "Workout is already in your plan." };
     }
     setTodaysPlan([...todaysPlan, workout]);
+    showToast("Added to your plan successfully:", workout.name, "success");
     return { success: true, message: "Added to today's plan!" };
   };
 
-  const removeFromPlan = (id: string | number) => {
-    // Convert both IDs to strings to bypass number vs string strict inequality
+  const removeFromPlan = (id: string | number, workoutName?: string) => {
+    const target = todaysPlan.find((w) => String(w.id) === String(id));
+    const name = workoutName || target?.name || "Workout";
+    
     setTodaysPlan(todaysPlan.filter((w) => String(w.id) !== String(id)));
+    showToast("Removed from the plan:", name, "error");
   };
 
   const saveWorkout = (workout: Workout) => {
     if (!savedWorkouts.some((w) => String(w.id) === String(workout.id))) {
       setSavedWorkouts([...savedWorkouts, workout]);
+      showToast("Saved successfully:", workout.name, "success");
+    } else {
+      showToast("Already saved:", workout.name, "error");
     }
   };
 
-  const unsaveWorkout = (id: string | number) => {
-    // Convert both IDs to strings
+  const unsaveWorkout = (id: string | number, workoutName?: string) => {
+    const target = savedWorkouts.find((w) => String(w.id) === String(id));
+    const name = workoutName || target?.name || "Workout";
+
     setSavedWorkouts(savedWorkouts.filter((w) => String(w.id) !== String(id)));
+    showToast("Removed from saved workouts:", name, "error");
   };
 
   return (
@@ -112,9 +148,17 @@ export const WorkoutProvider = ({ children }: { children: React.ReactNode }) => 
         removeFromPlan,
         saveWorkout,
         unsaveWorkout,
+        showToast,
       }}
     >
       {children}
+      <Toast
+        message={toastInfo.message}
+        workoutName={toastInfo.workoutName}
+        type={toastInfo.type}
+        isVisible={toastInfo.isVisible}
+        onClose={hideToast}
+      />
     </WorkoutContext.Provider>
   );
 };

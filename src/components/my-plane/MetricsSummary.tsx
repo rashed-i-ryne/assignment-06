@@ -8,7 +8,6 @@ interface MetricsSummaryProps {
 }
 
 const MetricsSummary = ({ todaysPlan, savedWorkouts, activeTab }: MetricsSummaryProps) => {
-  // Choose which list to calculate based on the active tab
   const currentList = activeTab === "plan" ? todaysPlan : savedWorkouts;
 
   const totalExercises = currentList.length;

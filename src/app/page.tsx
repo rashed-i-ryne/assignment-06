@@ -7,7 +7,6 @@ const Home = () => {
       <main className="min-h-screen w-full flex flex-col">
         <HeroSection />
         <Library />
-        {/* Footer removed from here because layout.tsx handles it globally */}
       </main>
     </div>
   );

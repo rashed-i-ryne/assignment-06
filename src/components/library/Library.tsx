@@ -8,13 +8,12 @@ import WorkoutCard from './WorkoutCard';
 const Library = () => {
   const [workouts, setWorkouts] = useState<Workout[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [hasError, setHasError] = useState(false); // Added error state
+  const [hasError, setHasError] = useState(false);
 
   useEffect(() => {
     const fetchWorkouts = async () => {
       try {
         const data = await getAllWorkouts();
-        // Fallback safety check to guarantee we only set an array, preventing .map crashes
         setWorkouts(Array.isArray(data) ? data : []);
       } catch (err) {
         console.error("Failed to load workouts:", err);
@@ -29,7 +28,6 @@ const Library = () => {
 
   return (
     <section id="library" className="py-24 px-4 scroll-mt-16">
-      {/* Custom Keyframe Animation Styles */}
       <style dangerouslySetInnerHTML={{__html: `
         @keyframes custom-stretch {
           0%, 40%, 100% { transform: scaleY(0.4); }
@@ -49,9 +47,9 @@ const Library = () => {
       `}} />
 
       <div className="container mx-auto max-w-[1400px]">
-        {/* Header Section */}
+        
         <div className="text-center md:text-left mb-10">
-          {/* FIXED: Changed text-black to text-white for visibility on the dark background */}
+          
           <h2 className="text-4xl md:text-5xl font-black uppercase tracking-tight mb-4 text-white">
             THE LIBRARY
           </h2>
