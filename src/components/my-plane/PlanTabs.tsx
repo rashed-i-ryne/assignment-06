@@ -16,13 +16,16 @@ const PlanTabs = ({ activeTab, setActiveTab }: PlanTabsProps) => {
     useWorkout();
   const [sortBy, setSortBy] = useState("duration");
   const currentList = activeTab === "plan" ? todaysPlan : savedWorkouts;
+  
   const sortedList = [...currentList].sort((a, b) => {
     if (sortBy === "calories") {
       return (Number(b.caloriesBurned) || 0) - (Number(a.caloriesBurned) || 0);
     }
+    if (sortBy === "rating") {
+      return (Number(b.rating) || 0) - (Number(a.rating) || 0);
+    }
     return (Number(b.duration) || 0) - (Number(a.duration) || 0);
   });
-
 
   const handleMarkAsDone = (id: string | number) => {
     const targetWorkout = todaysPlan.find((w) => String(w.id) === String(id));
@@ -76,6 +79,7 @@ const PlanTabs = ({ activeTab, setActiveTab }: PlanTabsProps) => {
           >
             <option value="duration">Duration</option>
             <option value="calories">Calories</option>
+            <option value="rating">Rating</option>
           </select>
         </div>
       </div>
