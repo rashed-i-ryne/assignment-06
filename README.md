@@ -21,3 +21,15 @@ FitLog is a dark, no-nonsense fitness web application built with Next.js App Rou
 5. **Robust Error & Loading States:** Includes smooth async loading indicators, persistent client-side data synchronization via `localStorage`, and a custom 404 fallback page for invalid routes.
 
 ---
+
+## 🚀 Advanced Features & AI-Assisted Enhancements
+
+Beyond fulfilling the core assignment requirements, I wanted to push this application further to create a polished, production-ready user experience. Inspired by my instructor to explore how AI can assist in modern software development, I used AI as a brainstorming partner to suggest creative features and UX improvements that weren't part of the initial rubric. 
+
+Once I had those suggestions, I dove into the official documentation, structured the TypeScript types, handled the state management, and implemented everything by hand. Here are the key extra features added to the app:
+
+* **Custom Workout Creator & Local Persistence:** Built a fully interactive modal allowing users to create custom lifts (with custom names, durations, equipment, and image URLs) saved securely to browser `localStorage`.
+* **Custom Workout Deletion & Cascading State:** Implemented complete deletion logic with cascade cleanup, ensuring deleted custom lifts are automatically scrubbed from active plans and saved favorites to prevent broken states or orphaned references.
+* **Home Page Library Constraints & Dedicated Catalog:** Optimized the home page UX by capping the main library display to **9 API items and 3 custom items**, paired with a dedicated **All Workouts Catalog (`/workouts`)** page for unconstrained browsing.
+* **Robust Dynamic Routing & ID Handling:** Engineered safe string-versus-number ID comparisons (`custom-[timestamp]` formatting) and a direct `localStorage` fallback inside dynamic route parameters (`/workouts/[id]`) to completely eliminate false "Not Found" errors.
+* **Workout History & Streak Tracking:** Added an integrated history log with streak counters, completion timestamps, and a reset confirmation mechanism.
